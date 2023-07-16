@@ -1,6 +1,7 @@
 from enum import Enum
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Optional
 import random
+from generic_search import dfs, Node, node_to_path
 
 class Cell(str, Enum):
     EMPTY = "E"
@@ -50,6 +51,17 @@ class Maze:
             locations.append(MazeLocation(ml.row, ml.col - 1))
         return locations
     
+    def mark(self, path: List[MazeLocation]):
+        for maze_location in path:
+            self._grid[maze_location.row][maze_location.col] = Cell.PATH
+        self._grid[self.start.row][self.start.col] = Cell.START
+        self._grid[self.goal.row][self.goal.col] = Cell.GOAL
+    
+    def clear(self, path: List[MazeLocation]):
+        for maze_location in path:
+            self._grid[maze_location.row][maze_location.col] = Cell.EMPTY
+        self._grid[self.start.row][self.start.col] = Cell.START
+        self._grid[self.goal.row][self.goal.col] = Cell.GOAL
     
     def __str__(self) -> str:
         output: str = ""
@@ -59,3 +71,11 @@ class Maze:
 
 maze: Maze = Maze()
 print(maze)
+solution1: Optional[Node[MazeLocation]] = dfs(maze.start, maze.goal_test, maze.successors)
+if solution1 is None:
+    print("No solution Found")
+else:
+    path1: List[MazeLocation] = node_to_path(solution1)
+    maze.mark(path1)
+    print(maze)
+    maze.clear(path1)

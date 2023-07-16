@@ -79,4 +79,12 @@ def dfs(initial: T, goal_test: Callable[[T], bool], succussors: Callable[[T], Li
             frontier.push(Node(child, current_node))
     return None
 
+def node_to_path(node: Node[T]) -> List[T]:
+    path: List[T] = [node.state]
+    while node.parent is not None:
+        node = node.parent
+        path.append(node.state)
+    path.reverse()
+    return path
+
 # print(binary_contains(['a', 'd', 'e', 'q', 'z'], 'q'))
