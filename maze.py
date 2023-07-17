@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import NamedTuple, List, Optional
 import random
-from generic_search import dfs, Node, node_to_path
+from generic_search import dfs, Node, node_to_path, bfs
+
 
 class Cell(str, Enum):
     EMPTY = "E"
@@ -41,13 +42,13 @@ class Maze:
     
     def successors(self, ml: MazeLocation) -> List[MazeLocation]:
         locations: List[MazeLocation] = []
-        if ml.row + 1 < self._rows and self._grid[ml.row + 1][ml.col] != Cell.BLOCKED:
+        if ml.row + 1 < self._rows and self._grid[ml.row + 1][ml.col] != Cell.BLOCKED: # UP
             locations.append(MazeLocation(ml.row+1, ml.col))
-        if ml.row - 1 > -1 and self._grid[ml.row - 1][ml.col] != Cell.BLOCKED:
+        if ml.row - 1 > -1 and self._grid[ml.row - 1][ml.col] != Cell.BLOCKED: # DOWN
             locations.append(MazeLocation(ml.row-1, ml.col))
-        if ml.col + 1 < self._cols and self._grid[ml.row][ml.col + 1] != Cell.BLOCKED:
+        if ml.col + 1 < self._cols and self._grid[ml.row][ml.col + 1] != Cell.BLOCKED: # RIGHT
             locations.append(MazeLocation(ml.row, ml.col + 1))
-        if ml.col - 1 > -1 and self._grid[ml.row][ml.col - 1] != Cell.BLOCKED:
+        if ml.col - 1 > -1 and self._grid[ml.row][ml.col - 1] != Cell.BLOCKED: # LEFT
             locations.append(MazeLocation(ml.row, ml.col - 1))
         return locations
     
@@ -71,11 +72,23 @@ class Maze:
 
 maze: Maze = Maze()
 print(maze)
+
+# TEST DFS
 solution1: Optional[Node[MazeLocation]] = dfs(maze.start, maze.goal_test, maze.successors)
 if solution1 is None:
     print("No solution Found")
 else:
     path1: List[MazeLocation] = node_to_path(solution1)
     maze.mark(path1)
+    print(maze)
+    maze.clear(path1)
+    
+# TEST BFS
+solution2: Optional[Node[MazeLocation]] = bfs(maze.start, maze.goal_test, maze.successors)
+if solution2 is None:
+    print("No solution Found.")
+else:
+    path2: List[MazeLocation] = node_to_path(solution2)
+    maze.mark(path2)
     print(maze)
     maze.clear(path1)
