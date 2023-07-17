@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import NamedTuple, List, Optional
+from typing import NamedTuple, List, Optional, Callable
 import random
-from generic_search import dfs, Node, node_to_path, bfs
-
+from generic_search import dfs, Node, node_to_path, bfs, astar
+import math
 
 class Cell(str, Enum):
     EMPTY = "E"
@@ -70,6 +70,24 @@ class Maze:
             output += "".join([c.value for c in row]) + '\n'
         return output
 
+
+
+def euclidean_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
+    def distance(ml: MazeLocation) -> float:
+        xdist: int = ml.col - goal.col
+        ydist: int = ml.row - goal.row
+        return math.sqrt(xdist**2+ydist**2)
+    return distance
+
+def manhattan_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
+    def distance(ml: MazeLocation) -> float:
+        xdist: int = abs(ml.col - goal.col)
+        ydist: int = abs(ml.row - goal.row)
+        return (xdist+ydist)
+    return distance
+
+# TEST
+
 maze: Maze = Maze()
 print(maze)
 
@@ -92,3 +110,14 @@ else:
     maze.mark(path2)
     print(maze)
     maze.clear(path1)
+    
+# TEST A*
+distance: Callable[[MazeLocation], float] = manhattan_distance(maze.goal)
+solution3: Optional[Node[MazeLocation]] = astar(maze.start, maze.goal_test, maze.successors, distance)
+if solution3 is None:
+    print("No solution Found.")
+else:
+    path3: List[MazeLocation] = node_to_path(solution3)
+    maze.mark(path3)
+    print(maze)
+    maze.clear(path3)
